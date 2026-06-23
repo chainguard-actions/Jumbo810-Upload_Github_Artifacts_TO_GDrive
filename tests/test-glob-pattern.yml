@@ -1,0 +1,34 @@
+name: Test glob pattern for multiple files
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create multiple test files
+        run: |
+          mkdir -p /tmp/test-glob
+          echo "file one" > /tmp/test-glob/file1.txt
+          echo "file two" > /tmp/test-glob/file2.txt
+          echo "file three" > /tmp/test-glob/file3.txt
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          credentials: ${{ 'eyJrZXkiOiAiZmFrZSJ9' }}
+          parent_folder_id: "fake_folder_id_12345"
+          target: "/tmp/test-glob/*.txt"
+
+      - name: Assert action failed with invalid credentials (glob scenario)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid credentials, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed with invalid credentials for glob pattern"

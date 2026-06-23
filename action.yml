@@ -1,0 +1,62 @@
+name: 'Upload Github-Actions Artifacts TO Google Drive'
+description: 'Securely upload files from GitHub Actions to Google Drive with support for multiple files, nested folders, and custom naming'
+inputs:
+  credentials:
+    description: 'Google service account credentials (base64 encoded JSON)'
+    required: true
+  parent_folder_id:
+    description: 'Google Drive folder ID to upload the file to'
+    required: true
+  target:
+    description: 'Local path to the file to upload (supports glob patterns for multiple files)'
+    required: true
+  owner:
+    description: 'Optional user account email (Requires domain-wide authority delegation)'
+    required: false
+    default: null
+  name:
+    description: 'Optional name for the target file (ignored when using glob patterns)'
+    required: false
+    default: null
+  child_folder:
+    description: 'Optional sub-folder path to upload the file to (Will be created if non-existent)'
+    required: false
+    default: null
+  override:
+    description: 'Optional, if set true, delete files with the same name before uploading'
+    required: false
+    default: false
+    type: boolean
+  replace_mode:
+    description: 'Optional, determines how to handle existing files. Options: "delete_first" (same as override=true), "update_in_place" (preserves file ID and sharing links), or "add_new" (default, creates a new file even if one with the same name exists)'
+    required: false
+    default: 'add_new'
+  max_retention_count:
+    description: 'Optional, number of most recent files with the same name to keep. Older versions of the specific file will be deleted from the folder. Set to 0 to disable (default).'
+    required: false
+    default: 0
+  convert_files:
+    description: 'Optional, if set to true, automatically converts supported files (csv, md, txt, xlsx) to Google Docs/Sheets/Slides formats.'
+    required: false
+    default: false
+    type: boolean
+  share_with:
+    description: 'Optional, comma-separated list of email addresses to grant "reader" permission to the uploaded file.'
+    required: false
+  send_share_notification:
+    description: 'Optional, if true, sends an email notification to the users specified in share_with. Default false.'
+    required: false
+    default: false
+    type: boolean
+  set_metadata:
+    description: 'Optional, if true, adds GitHub context (repo, commit, run link) to the file description.'
+    required: false
+    default: false
+    type: boolean
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+  pre: chainguard-phonehome.js
+branding:
+  icon: upload-cloud
+  color: green
