@@ -8,6 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| v2.3.1 | [`v2.3.1`](https://github.com/chainguard-actions/Jumbo810-Upload_Github_Artifacts_TO_GDrive/tree/v2.3.1) | [`e444972`](https://github.com/Jumbo810/Upload_Github_Artifacts_TO_GDrive/commit/e444972bfde8722377b607d59b753bb4d8346fe7) |
 | v2.3.3 | [`v2.3.3`](https://github.com/chainguard-actions/Jumbo810-Upload_Github_Artifacts_TO_GDrive/tree/v2.3.3) | [`d9619b0`](https://github.com/Jumbo810/Upload_Github_Artifacts_TO_GDrive/commit/d9619b05e87660e5e0f7c4d5c431c735845f4982) |
 
 ## Privacy
