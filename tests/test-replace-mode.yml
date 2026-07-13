@@ -1,0 +1,59 @@
+name: Test replace_mode options
+on:
+  workflow_dispatch:
+jobs:
+  test-delete-first:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create a test artifact file
+        run: |
+          echo "replace mode test content" > /tmp/replace-mode-test.txt
+
+      - name: Run action with replace_mode delete_first
+        id: action-delete-first
+        uses: .
+        continue-on-error: true
+        with:
+          credentials: "aW52YWxpZC1jcmVkZW50aWFscw=="
+          parent_folder_id: "fake-folder-id-12345"
+          target: "/tmp/replace-mode-test.txt"
+          replace_mode: "delete_first"
+
+      - name: Assert action failed (expected with invalid credentials)
+        run: |
+          echo "outcome: ${{ steps.action-delete-first.outcome }}"
+          if [ "${{ steps.action-delete-first.outcome }}" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid credentials"
+            exit 1
+          fi
+          echo "PASS: action with replace_mode=delete_first correctly failed at credential validation"
+
+  test-update-in-place:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create a test artifact file
+        run: |
+          echo "update in place test content" > /tmp/update-in-place-test.txt
+
+      - name: Run action with replace_mode update_in_place
+        id: action-update-in-place
+        uses: .
+        continue-on-error: true
+        with:
+          credentials: "aW52YWxpZC1jcmVkZW50aWFscw=="
+          parent_folder_id: "fake-folder-id-12345"
+          target: "/tmp/update-in-place-test.txt"
+          replace_mode: "update_in_place"
+
+      - name: Assert action failed (expected with invalid credentials)
+        run: |
+          echo "outcome: ${{ steps.action-update-in-place.outcome }}"
+          if [ "${{ steps.action-update-in-place.outcome }}" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid credentials"
+            exit 1
+          fi
+          echo "PASS: action with replace_mode=update_in_place correctly failed at credential validation"
