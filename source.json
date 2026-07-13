@@ -1,6 +1,11 @@
 {
   "owner": "Jumbo810",
   "repo": "Upload_Github_Artifacts_TO_GDrive",
-  "version": "",
-  "url": "https://github.com/Jumbo810/Upload_Github_Artifacts_TO_GDrive"
+  "version": "v2.3.4",
+  "commit_sha": "87653dbaa15d083eb92a8e48823ac89ea6015cd3",
+  "url": "https://github.com/Jumbo810/Upload_Github_Artifacts_TO_GDrive",
+  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
+  "test_agent_version": "1",
+  "harden_agent_version": "1"
 }
