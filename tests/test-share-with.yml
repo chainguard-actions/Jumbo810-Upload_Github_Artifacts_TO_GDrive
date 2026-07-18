@@ -17,16 +17,16 @@ jobs:
           credentials: aW52YWxpZC1jcmVkZW50aWFscw==
           parent_folder_id: fake-folder-id
           target: /tmp/test-share.txt
-          share_with: "test-user@example.com,another-user@example.com"
+          share_with: user@example.com,another@example.com
           send_share_notification: false
 
-      - name: Assert action ran (with invalid credentials it should fail)
+      - name: Assert action failed due to invalid credentials
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" != "failure" ]; then
-            echo "FAIL: expected action to fail with invalid credentials, got '$OUTCOME'"
+            echo "FAIL: expected action to fail with invalid credentials, got: $OUTCOME"
             exit 1
           fi
-          echo "PASS: action correctly failed with invalid credentials while share_with was exercised"
+          echo "PASS: action correctly failed with invalid credentials when share_with is set"

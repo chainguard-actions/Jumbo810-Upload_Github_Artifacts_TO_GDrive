@@ -1,4 +1,4 @@
-name: Test invalid credentials error handling
+name: Test invalid replace_mode validation
 on:
   workflow_dispatch:
 jobs:
@@ -17,14 +17,15 @@ jobs:
           credentials: 'aW52YWxpZC1jcmVkZW50aWFscw=='
           parent_folder_id: 'fake-folder-id'
           target: '/tmp/test-artifact.txt'
+          replace_mode: 'invalid_mode_xyz'
 
-      - name: Assert action failed with invalid credentials
+      - name: Assert action failed due to invalid replace_mode
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" != "failure" ]; then
-            echo "FAIL: expected action to fail with invalid credentials, but outcome was '$OUTCOME'"
+            echo "FAIL: expected action to fail with invalid replace_mode, but outcome was '$OUTCOME'"
             exit 1
           fi
-          echo "PASS: action correctly failed with invalid credentials"
+          echo "PASS: action correctly failed with invalid replace_mode"
