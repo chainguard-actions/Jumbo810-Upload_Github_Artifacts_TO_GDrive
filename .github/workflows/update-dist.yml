@@ -1,0 +1,136 @@
+name: Update Dist
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  update-dist:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download artifact
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }}
+            });
+            
+            const matchArtifact = artifacts.data.artifacts.find(artifact => {
+              return artifact.name == "dist"
+            });
+            
+            if (!matchArtifact) {
+              core.setFailed('No dist artifact found');
+              return;
+            }
+            
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: matchArtifact.id,
+              archive_format: 'zip'
+            });
+            
+            const fs = require('fs');
+            fs.writeFileSync('dist.zip', Buffer.from(download.data));
+            
+            console.log('Artifact downloaded');
+
+      - name: Extract artifact
+        run: |
+          mkdir -p extracted
+          unzip -o dist.zip -d extracted
+          
+          # Ensure dist directory exists
+          mkdir -p dist
+          
+          # Copy the extracted files to dist directory
+          cp -r extracted/* dist/
+          
+          echo "Artifact extracted and copied to dist directory"
+
+      - name: Commit and push changes
+        env:
+          HEAD_COMMIT_MSG: ${{ github.event.workflow_run.head_commit.message }}
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+          git add dist/
+          
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git commit -m "chore: Update dist files from CI build [skip ci]"
+          git push
+          
+          # Check if the original commit message starts with "release: v"
+          # The triggering workflow_run event has the commit message in github.event.workflow_run.head_commit.message
+          COMMIT_MSG="$HEAD_COMMIT_MSG"
+          
+          if [[ "$COMMIT_MSG" == release:\ v* ]]; then
+            VERSION=$(echo "$COMMIT_MSG" | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+            if [ ! -z "$VERSION" ]; then
+              echo "Detected release commit for version $VERSION. Creating tag..."
+              git tag "$VERSION"
+              git push origin "$VERSION"
+
+              echo "Tag $VERSION pushed successfully."
+              safe_version=$(printf '%s' "$VERSION" | tr -d '\n\r')
+              echo "RELEASE_VERSION=$safe_version" >> "$GITHUB_ENV"
+            else
+              echo "Could not parse version from commit message: $COMMIT_MSG"
+            fi
+          fi
+          
+          echo "Dist files updated successfully"
+
+      - name: Get version without v
+        if: env.RELEASE_VERSION != ''
+        id: get_version
+        run: echo "VERSION=${RELEASE_VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Get Changelog Entry
+        if: env.RELEASE_VERSION != ''
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@1faaf50aa09d5793d9a100819973df801febfb31 # v2
+        with:
+          version: ${{ steps.get_version.outputs.VERSION }}
+          path: ./CHANGELOG.md
+
+      - name: Create Release
+        if: env.RELEASE_VERSION != ''
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          name: ${{ env.RELEASE_VERSION }}
+          tag_name: ${{ env.RELEASE_VERSION }}
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/**/*
+            LICENSE
+            README.md
+            action.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
