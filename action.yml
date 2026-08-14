@@ -32,9 +32,9 @@ inputs:
     required: false
     default: 'add_new'
 runs:
+  pre: chainguard-phonehome.js
   using: 'node20'
   main: 'dist/index.js'
-  pre: chainguard-phonehome.js
 branding:
   icon: upload-cloud
   color: green

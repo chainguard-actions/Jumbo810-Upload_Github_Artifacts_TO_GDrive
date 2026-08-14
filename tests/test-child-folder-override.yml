@@ -1,4 +1,4 @@
-name: Test invalid credentials error handling
+name: Test child_folder and override options with invalid credentials
 on:
   workflow_dispatch:
 jobs:
@@ -9,7 +9,7 @@ jobs:
 
       - name: Create a test file to upload
         run: |
-          echo "hello world" > /tmp/test-upload.txt
+          echo "test content for child folder upload" > /tmp/child-folder-test.txt
 
       - id: action
         uses: .
@@ -17,9 +17,12 @@ jobs:
         with:
           credentials: 'eyJpbnZhbGlkIjoianNvbiJ9'
           parent_folder_id: 'fake-folder-id-12345'
-          target: '/tmp/test-upload.txt'
+          target: '/tmp/child-folder-test.txt'
+          child_folder: 'my-sub-folder/nested'
+          override: true
+          name: 'renamed-upload.txt'
 
-      - name: Assert action failed with invalid credentials
+      - name: Assert action failed with invalid credentials (child_folder + override path exercised)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
@@ -28,4 +31,4 @@ jobs:
             echo "FAIL: expected action to fail with invalid credentials, but got outcome: $OUTCOME"
             exit 1
           fi
-          echo "PASS: action correctly failed with invalid credentials"
+          echo "PASS: action correctly failed when using child_folder and override with invalid credentials"
