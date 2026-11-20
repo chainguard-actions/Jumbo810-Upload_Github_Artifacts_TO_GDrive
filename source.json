@@ -4,8 +4,13 @@
   "version": "v2.3.4",
   "commit_sha": "87653dbaa15d083eb92a8e48823ac89ea6015cd3",
   "url": "https://github.com/Jumbo810/Upload_Github_Artifacts_TO_GDrive",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/Jumbo810/Upload_Github_Artifacts_TO_GDrive/v2.3.4/sha256-33d642351dd07de6558c0a31bfa03c01aaa0a0661f4e3ad6ef9dcec3f30d1d94.tar.gz",
+    "sha256": "33d642351dd07de6558c0a31bfa03c01aaa0a0661f4e3ad6ef9dcec3f30d1d94",
+    "size_bytes": 1605538
+  }
 }
